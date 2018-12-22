@@ -95,7 +95,7 @@ class MetaFileFormat(type):
     """
 
     @staticmethod
-    def openfile(filename, filepaths=None, encoding=None):
+    def openfile(filename, filepaths=None, encoding='utf-8'):
         """Find *filename* in given *filepaths*, and open it. Raises
         ``IOError`` if file cannot be opened.
 
