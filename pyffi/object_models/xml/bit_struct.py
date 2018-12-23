@@ -395,9 +395,11 @@ class BitStructBase(DetailNode, metaclass=_MetaBitStructBase):
         if data:
             version = data.version
             user_version = data.user_version
+            user_version_2 = data.user_version_2
         else:
             version = None
             user_version = None
+            user_version_2 = None
         for attr in self._attribute_list:
             # print(attr.name, version, attr.ver1, attr.ver2) # debug
 
@@ -412,6 +414,10 @@ class BitStructBase(DetailNode, metaclass=_MetaBitStructBase):
             # check user version
             if not(attr.userver is None or user_version is None) \
                and user_version != attr.userver:
+                continue
+            # check user version 2
+            if not(attr.userver2 is None or user_version_2 is None) \
+               and user_version_2 != attr.userver2:
                 continue
             # print("user version check passed") # debug
 

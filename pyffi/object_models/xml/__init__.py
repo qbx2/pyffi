@@ -222,6 +222,7 @@ class StructAttribute(object):
         self.ver1 = attrs.get("ver1")
         self.ver2 = attrs.get("ver2")
         self.userver = attrs.get("userver")
+        self.userver2 = attrs.get("userver2")
         self.doc = "" # handled in xml parser's characters function
         self.is_abstract = (attrs.get("abstract") == "1")
 
@@ -250,6 +251,8 @@ class StructAttribute(object):
                 self.arg = [cls.name_attribute(arg) for arg in self.arg.split('\\')]
         if self.userver:
             self.userver = int(self.userver)
+        if self.userver2:
+            self.userver2 = int(self.userver2)
         if self.ver1:
             self.ver1 = cls.version_number(self.ver1)
         if self.ver2:
@@ -274,6 +277,7 @@ class BitStructAttribute(object):
         self.ver1 = attrs.get("ver1")
         self.ver2 = attrs.get("ver2")
         self.userver = attrs.get("userver")
+        self.userver2 = attrs.get("userver2")
         self.doc = "" # handled in xml parser's characters function
 
         # post-processing
@@ -283,6 +287,8 @@ class BitStructAttribute(object):
             self.cond = Expression(self.cond, cls.name_attribute)
         if self.userver:
             self.userver = int(self.userver)
+        if self.userver2:
+            self.userver2 = int(self.userver2)
         if self.ver1:
             self.ver1 = cls.version_number(self.ver1)
         if self.ver2:
