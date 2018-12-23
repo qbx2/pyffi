@@ -1395,6 +1395,9 @@ class NifFormat(FileFormat):
                 # store block index
                 self._block_dct[block_index] = block
                 self.blocks.append(block)
+                if block_type == 'BSTriShape':
+                    print(hex(block.num_triangles))
+                    import pdb; pdb.set_trace()
                 # check block size
                 if self.version >= 0x14020007:
                     logger.debug("Checking block size")

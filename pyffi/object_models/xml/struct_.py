@@ -245,6 +245,7 @@ class StructBase(GlobalNode, metaclass=_MetaStructBase):
         names = set()
         # initialize argument
         self.arg = argument
+        self.template = template
         # save parent (note: disabled for performance)
         #self._parent = weakref.ref(parent) if parent else None
         # initialize item list
@@ -260,46 +261,49 @@ class StructBase(GlobalNode, metaclass=_MetaStructBase):
                 continue
             names.add(attr.name)
 
-            # things that can only be determined at runtime (rt_xxx)
-            rt_type = attr.type_ if attr.type_ != type(None) \
-                      else template
-            rt_template = attr.template if attr.template != type(None) \
-                          else template
-            if isinstance(attr.arg, (int, type(None))):
-                rt_arg = attr.arg
-            else:
-                rt_arg = self
-
-                for arg in attr.arg:
-                    rt_arg = getattr(rt_arg, arg)
-
-            # instantiate the class, handling arrays at the same time
-            if attr.arr1 == None:
-                attr_instance = rt_type(
-                    template = rt_template, argument = rt_arg,
-                    parent = self)
-                if attr.default != None:
-                    attr_instance.set_value(attr.default)
-            elif attr.arr2 == None:
-                attr_instance = Array(
-                    element_type = rt_type,
-                    element_type_template = rt_template,
-                    element_type_argument = rt_arg,
-                    count1 = attr.arr1,
-                    parent = self)
-            else:
-                attr_instance = Array(
-                    element_type = rt_type,
-                    element_type_template = rt_template,
-                    element_type_argument = rt_arg,
-                    count1 = attr.arr1, count2 = attr.arr2,
-                    parent = self)
-
+            # attr_instance = self.get_attr_instance(attr)
             # assign attribute value
-            setattr(self, "_%s_value_" % attr.name, attr_instance)
+            # setattr(self, "_%s_value_" % attr.name, attr_instance)
 
             # add instance to item list
-            self._items.append(attr_instance)
+            # self._items.append(attr_instance)
+
+    def get_attr_instance(self, attr):
+        # things that can only be determined at runtime (rt_xxx)
+        rt_type = attr.type_ if attr.type_ != type(None) \
+                    else self.template
+        rt_template = attr.template if attr.template != type(None) \
+                        else self.template
+        if isinstance(attr.arg, (int, type(None))):
+            rt_arg = attr.arg
+        else:
+            rt_arg = self
+
+            for arg in attr.arg:
+                rt_arg = getattr(rt_arg, arg)
+
+        # instantiate the class, handling arrays at the same time
+        if attr.arr1 == None:
+            attr_instance = rt_type(
+                template = rt_template, argument = rt_arg,
+                parent = self)
+            if attr.default != None:
+                attr_instance.set_value(attr.default)
+            return attr_instance
+        elif attr.arr2 == None:
+            return Array(
+                element_type = rt_type,
+                element_type_template = rt_template,
+                element_type_argument = rt_arg,
+                count1 = attr.arr1,
+                parent = self)
+        else:
+            return Array(
+                element_type = rt_type,
+                element_type_template = rt_template,
+                element_type_argument = rt_arg,
+                count1 = attr.arr1, count2 = attr.arr2,
+                parent = self)
 
     def deepcopy(self, block):
         """Copy attributes from a given block (one block class must be a
@@ -376,7 +380,8 @@ class StructBase(GlobalNode, metaclass=_MetaStructBase):
                     rt_arg = getattr(rt_arg, arg)
 
             # read the attribute
-            attr_value = getattr(self, "_%s_value_" % attr.name)
+            attr_value = self.get_attr_instance(attr)
+            setattr(self, "_%s_value_" % attr.name, attr_value)
             attr_value.arg = rt_arg
             # if hasattr(attr, "type_"):
             #     attr_value._elementType = attr.type_
@@ -400,9 +405,10 @@ class StructBase(GlobalNode, metaclass=_MetaStructBase):
                 for arg in attr.arg:
                     rt_arg = getattr(rt_arg, arg)
             # write the attribute
-            attr_value = getattr(self, "_%s_value_" % attr.name)
+            attr_value = self.get_attr_instance(attr)
+            setattr(self, "_%s_value_" % attr.name, attr_value)
             attr_value.arg = rt_arg
-            getattr(self, "_%s_value_" % attr.name).write(stream, data)
+            attr_value.write(stream, data)
             self._log_struct(stream, attr)
 
     def fix_links(self, data):
@@ -415,7 +421,9 @@ class StructBase(GlobalNode, metaclass=_MetaStructBase):
                 continue
             self.logger.debug("fixlinks %s" % attr.name)
             # fix the links in the attribute
-            getattr(self, "_%s_value_" % attr.name).fix_links(data)
+            attr_value = self.get_attr_instance(attr)
+            setattr(self, "_%s_value_" % attr.name, attr_value)
+            attr_value.fix_links(data)
 
     def get_links(self, data=None):
         """Get list of all links in the structure."""
@@ -440,8 +448,9 @@ class StructBase(GlobalNode, metaclass=_MetaStructBase):
             if (not attr.type_ is type(None)) and (not attr.type_._has_strings):
                 continue
             # extend list of strings
-            strings.extend(
-                getattr(self, "_%s_value_" % attr.name).get_strings(data))
+            attr_value = self.get_attr_instance(attr)
+            setattr(self, "_%s_value_" % attr.name, attr_value)
+            strings.extend(attr_value.get_strings(data))
         # return the list of all strings in all attributes
         return strings
 

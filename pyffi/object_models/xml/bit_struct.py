@@ -401,7 +401,7 @@ class BitStructBase(DetailNode, metaclass=_MetaBitStructBase):
             user_version = None
             user_version_2 = None
         for attr in self._attribute_list:
-            # print(attr.name, version, attr.ver1, attr.ver2) # debug
+            print(attr.name, user_version, user_version_2, attr.userver, attr.userver2) # debug
 
             # check version
             if not (version is None):

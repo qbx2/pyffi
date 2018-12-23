@@ -143,7 +143,9 @@ class Expression(object):
 
             # value is an arg attribute type, lookup parent for value to evaluate
             elif self._left == 'arg':
-                left = (getattr(data, self._left)).to_int(None)
+                left = (getattr(data, self._left))
+                if not isinstance(left, int):
+                    left = left.to_int(None)
             else:
                 left = getattr(data, self._left)
         elif isinstance(self._left, type):
@@ -169,7 +171,9 @@ class Expression(object):
 
             # value is an arg attribute type, lookup parent for value to evaluate
             elif self._right == 'arg':
-                right = (getattr(data, self._right)).to_int(None)
+                right = (getattr(data, self._right))
+                if not isinstance(right, int):
+                    right = right.to_int(None)
             else:
                 right = getattr(data, self._right)
         elif isinstance(self._right, type):
@@ -284,7 +288,7 @@ class Expression(object):
         # check if the left hand side starts with brackets
         # and if so, find the position of the starting bracket and the ending
         # bracket
-        left_startpos, left_endpos = cls._scan_brackets(expr_str)
+        left_startpos, left_endpos = cls._scanBrackets(expr_str)
         if left_startpos >= 0:
             # yes, it is a bracketted expression
             # so remove brackets and whitespace,
