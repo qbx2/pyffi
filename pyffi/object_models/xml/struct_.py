@@ -265,8 +265,13 @@ class StructBase(GlobalNode, metaclass=_MetaStructBase):
                       else template
             rt_template = attr.template if attr.template != type(None) \
                           else template
-            rt_arg = attr.arg if isinstance(attr.arg, (int, type(None))) \
-                     else getattr(self, attr.arg)
+            if isinstance(attr.arg, (int, type(None))):
+                rt_arg = attr.arg
+            else:
+                rt_arg = self
+
+                for arg in attr.arg:
+                    rt_arg = getattr(rt_arg, arg)
 
             # instantiate the class, handling arrays at the same time
             if attr.arr1 == None:
@@ -362,8 +367,14 @@ class StructBase(GlobalNode, metaclass=_MetaStructBase):
             if attr.is_abstract:
                 continue
             # get attribute argument (can only be done at runtime)
-            rt_arg = attr.arg if isinstance(attr.arg, (int, type(None))) \
-                else getattr(self, attr.arg)
+            if isinstance(attr.arg, (int, type(None))):
+                rt_arg = attr.arg
+            else:
+                rt_arg = self
+
+                for arg in attr.arg:
+                    rt_arg = getattr(rt_arg, arg)
+
             # read the attribute
             attr_value = getattr(self, "_%s_value_" % attr.name)
             attr_value.arg = rt_arg
@@ -381,8 +392,13 @@ class StructBase(GlobalNode, metaclass=_MetaStructBase):
             if attr.is_abstract:
                 continue
             # get attribute argument (can only be done at runtime)
-            rt_arg = attr.arg if isinstance(attr.arg, (int, type(None))) \
-                     else getattr(self, attr.arg)
+            if isinstance(attr.arg, (int, type(None))):
+                rt_arg = attr.arg
+            else:
+                rt_arg = self
+
+                for arg in attr.arg:
+                    rt_arg = getattr(rt_arg, arg)
             # write the attribute
             attr_value = getattr(self, "_%s_value_" % attr.name)
             attr_value.arg = rt_arg

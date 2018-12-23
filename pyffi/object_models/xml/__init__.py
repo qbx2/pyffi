@@ -247,7 +247,7 @@ class StructAttribute(object):
             try:
                 self.arg = int(self.arg)
             except ValueError:
-                self.arg = cls.name_attribute(self.arg)
+                self.arg = [cls.name_attribute(arg) for arg in self.arg.split('\\')]
         if self.userver:
             self.userver = int(self.userver)
         if self.ver1:
